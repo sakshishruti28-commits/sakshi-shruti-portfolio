@@ -34,7 +34,12 @@ function fetchUrl(rawUrl) {
     })
 }
 function textOnly(html) { return html.replace(/<script[\s\S]*?<\/script>/gi, " ").replace(/<style[\s\S]*?<\/style>/gi, " ").replace(/<noscript[\s\S]*?<\/noscript>/gi, " ").replace(/<[^>]+>/g, " ").replace(/&nbsp;/gi, " ").replace(/&amp;/gi, "&").replace(/&quot;/gi, "\"").replace(/&#39;/gi, "'").replace(/\s+/g, " ").trim() }
-function all(html, regex) { return Array.from(html.matchAll(regex)).map(match => match[1] || match[0]) }
+function all(html, regex) {
+    const flags = regex.flags.includes("g") ? regex.flags : regex.flags + "g"
+    const globalRegex = new RegExp(regex.source, flags)
+
+    return Array.from(html.matchAll(globalRegex)).map(match => match[1] || match[0])
+}
 function blocks(html, tag) { return all(html, new RegExp("<" + tag + "[^>]*>([\\s\\S]*?)<\\/" + tag + ">", "gi")).map(textOnly).filter(Boolean) }
 function cap(value, max) { return Math.max(0, Math.min(max, value)) }
 function count(text, regex) { return (text.match(regex) || []).length }
